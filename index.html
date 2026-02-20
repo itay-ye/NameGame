@@ -2,7 +2,7 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>נחשו את השם 👶</title>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
@@ -22,6 +22,11 @@
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
+  html, body {
+    height: 100%;
+    height: 100dvh;
+  }
+
   body {
     background: var(--bg);
     color: var(--text);
@@ -29,72 +34,63 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-height: 100vh;
-    overflow-x: hidden;
+    overflow: hidden; /* no scroll — everything fits in viewport */
   }
 
+  /* ── Header ── */
   header {
     width: 100%;
-    max-width: 500px;
-    padding: 14px 16px 12px;
+    flex-shrink: 0;
+    padding: 10px 16px 8px;
     border-bottom: 1px solid var(--header-border);
     text-align: center;
   }
+  header h1 { font-size: clamp(1.1rem, 4vw, 1.5rem); font-weight: 900; color: var(--pink); }
+  header p  { font-size: clamp(0.65rem, 2.5vw, 0.78rem); color: var(--text-muted); margin-top: 2px; }
 
-  header h1 {
-    font-size: 1.5rem;
-    font-weight: 900;
-    letter-spacing: 1px;
-    color: var(--pink);
-  }
-
-  header p {
-    font-size: 0.78rem;
-    color: var(--text-muted);
-    margin-top: 3px;
-  }
-
+  /* ── Toast ── */
   #toast-container {
     position: fixed;
-    top: 76px;
+    top: 60px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 1000;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     pointer-events: none;
   }
-
   .toast {
     background: var(--text);
     color: var(--bg);
-    padding: 10px 20px;
+    padding: 8px 18px;
     border-radius: 6px;
     font-weight: 700;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     animation: toastIn 0.2s ease, toastOut 0.3s ease 1.5s forwards;
     white-space: nowrap;
   }
-
-  @keyframes toastIn { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes toastIn  { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
   @keyframes toastOut { from { opacity:1; } to { opacity:0; } }
 
+  /* ── Board ── */
   #board-container {
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 16px;
+    padding: 8px 0;
+    min-height: 0; /* allow flex shrink */
   }
 
   #board {
     display: grid;
     grid-template-rows: repeat(4, 1fr);
     gap: 5px;
-    width: min(280px, 80vw);
-    height: min(280px, 80vw);
+    /* Size = smaller of: 55vw, 42vh — keeps it compact on any phone */
+    width: min(55vw, 42vh, 220px);
+    height: min(55vw, 42vh, 220px);
   }
 
   .row {
@@ -110,97 +106,86 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: clamp(1.3rem, 5.5vw, 1.9rem);
+    font-size: clamp(1rem, 4vw, 1.6rem);
     font-weight: 900;
     user-select: none;
   }
 
   .tile[data-letter] { border-color: #565758; }
-  .tile.shake { animation: shake 0.5s ease; }
-  .tile.bounce { animation: bounce 0.55s ease; }
-  .tile.pop { animation: pop 0.1s ease; }
+  .tile.shake   { animation: shake 0.5s ease; }
+  .tile.bounce  { animation: bounce 0.55s ease; }
+  .tile.pop     { animation: pop 0.1s ease; }
 
-  @keyframes pop {
-    0%,100% { transform: scale(1); }
-    50% { transform: scale(1.12); }
-  }
-  @keyframes shake {
-    0%,100% { transform: translateX(0); }
-    10%,50%,90% { transform: translateX(-4px); }
-    30%,70% { transform: translateX(4px); }
-  }
-  @keyframes bounce {
-    0%,100% { transform: translateY(0); }
-    40% { transform: translateY(-22px); }
-    70% { transform: translateY(-10px); }
-  }
+  @keyframes pop    { 0%,100%{transform:scale(1)} 50%{transform:scale(1.12)} }
+  @keyframes shake  { 0%,100%{transform:translateX(0)} 10%,50%,90%{transform:translateX(-4px)} 30%,70%{transform:translateX(4px)} }
+  @keyframes bounce { 0%,100%{transform:translateY(0)} 40%{transform:translateY(-18px)} 70%{transform:translateY(-8px)} }
   @keyframes flipReveal {
-    0% { transform: rotateX(0deg); }
-    49% { transform: rotateX(-90deg); }
-    50% { transform: rotateX(-90deg); }
-    100% { transform: rotateX(0deg); }
+    0%   { transform:rotateX(0deg); }
+    49%  { transform:rotateX(-90deg); }
+    50%  { transform:rotateX(-90deg); }
+    100% { transform:rotateX(0deg); }
   }
 
-  .tile.reveal { animation: flipReveal 0.5s ease forwards; }
-  .tile.correct { background: var(--tile-correct); border-color: var(--tile-correct); }
-  .tile.present { background: var(--tile-present); border-color: var(--tile-present); }
-  .tile.absent  { background: var(--tile-absent);  border-color: var(--tile-absent);  }
+  .tile.reveal  { animation: flipReveal 0.5s ease forwards; }
+  .tile.correct { background:var(--tile-correct); border-color:var(--tile-correct); }
+  .tile.present { background:var(--tile-present); border-color:var(--tile-present); }
+  .tile.absent  { background:var(--tile-absent);  border-color:var(--tile-absent);  }
 
-  /* Keyboard */
+  /* ── Keyboard ── */
   #keyboard {
     width: 100%;
-    max-width: 500px;
-    padding: 0 6px 20px;
+    flex-shrink: 0;
+    padding: 0 4px env(safe-area-inset-bottom, 8px);
     display: flex;
     flex-direction: column;
-    gap: 7px;
+    gap: 5px;
   }
 
   .kb-row {
     display: flex;
     justify-content: center;
-    gap: 5px;
+    gap: 4px;
+    padding: 0 2px;
   }
 
   .key {
-    height: 56px;
-    min-width: 40px;
-    padding: 0 4px;
+    /* Height scales with viewport height so keyboard never overflows */
+    height: clamp(38px, 6.5vh, 56px);
+    flex: 1;
+    min-width: 0; /* allow shrinking */
+    padding: 0 2px;
     border: none;
     border-radius: 4px;
     background: var(--key-bg);
     color: var(--text);
     font-family: 'Heebo', sans-serif;
-    font-size: 1.05rem;
+    font-size: clamp(0.75rem, 3vw, 1.05rem);
     font-weight: 700;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex: 1;
-    max-width: 42px;
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
     transition: background 0.2s;
   }
 
   .key.wide {
-    min-width: 58px;
-    max-width: 62px;
-    font-size: 0.78rem;
+    flex: 1.6;
+    font-size: clamp(0.6rem, 2.5vw, 0.8rem);
   }
 
-  .key:active { opacity: 0.75; }
-  .key.correct { background: var(--tile-correct); }
-  .key.present { background: var(--tile-present); }
-  .key.absent  { background: var(--tile-absent);  }
+  .key:active   { opacity: 0.7; }
+  .key.correct  { background: var(--tile-correct); }
+  .key.present  { background: var(--tile-present); }
+  .key.absent   { background: var(--tile-absent);  }
 
-  /* Modal */
+  /* ── Modal ── */
   #modal-overlay {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.75);
+    background: rgba(0,0,0,0.78);
     z-index: 500;
     align-items: center;
     justify-content: center;
@@ -211,23 +196,22 @@
     background: var(--modal-bg);
     border: 1px solid var(--header-border);
     border-radius: 16px;
-    padding: 32px 28px;
-    max-width: 340px;
-    width: 90%;
+    padding: 28px 24px;
+    max-width: 320px;
+    width: 88%;
     text-align: center;
     animation: modalIn 0.3s ease;
   }
+  @keyframes modalIn { from{transform:scale(0.88);opacity:0} to{transform:scale(1);opacity:1} }
 
-  @keyframes modalIn { from { transform:scale(0.88); opacity:0; } to { transform:scale(1); opacity:1; } }
-
-  #modal .emoji { font-size: 3rem; margin-bottom: 10px; }
-  #modal h2 { font-size: 1.4rem; font-weight: 900; margin-bottom: 8px; }
-  #modal .desc { color: var(--text-muted); font-size: 0.95rem; line-height: 1.5; margin-bottom: 12px; }
-  #modal .answer-word { font-size: 2.4rem; font-weight: 900; color: var(--pink); margin: 8px 0 4px; }
-  #modal .tries-line { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px; }
+  #modal .emoji      { font-size: 2.6rem; margin-bottom: 8px; }
+  #modal h2          { font-size: 1.3rem; font-weight: 900; margin-bottom: 6px; }
+  #modal .desc       { color: var(--text-muted); font-size: 0.9rem; line-height: 1.5; margin-bottom: 10px; }
+  #modal .answer-word{ font-size: 2.2rem; font-weight: 900; color: var(--pink); margin: 6px 0 4px; }
+  #modal .tries-line { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 18px; }
 
   #play-again {
-    padding: 14px;
+    padding: 12px;
     background: var(--pink);
     color: white;
     border: none;
@@ -240,12 +224,6 @@
     transition: opacity 0.2s;
   }
   #play-again:hover { opacity: 0.85; }
-
-  @media (max-width: 360px) {
-    .key { height: 50px; font-size: 0.9rem; min-width: 34px; max-width: 36px; }
-    .key.wide { min-width: 52px; max-width: 56px; }
-    #board { width: min(260px, 82vw); height: min(260px, 82vw); }
-  }
 </style>
 </head>
 <body>
@@ -275,267 +253,187 @@
 </div>
 
 <script>
-// ─── Config ────────────────────────────────────────────────────
-const ANSWER = 'ארבל';
+const ANSWER   = 'ארבל';
 const MAX_TRIES = 4;
-const WORD_LEN = 4;
+const WORD_LEN  = 4;
 
-// Regular → final form (applied only at end of word)
-const TO_FINAL   = { 'כ':'ך', 'מ':'ם', 'נ':'ן', 'פ':'ף', 'צ':'ץ' };
-const FROM_FINAL = { 'ך':'כ', 'ם':'מ', 'ן':'נ', 'ף':'פ', 'ץ':'צ' };
+const TO_FINAL   = { 'כ':'ך','מ':'ם','נ':'ן','פ':'ף','צ':'ץ' };
+const FROM_FINAL = { 'ך':'כ','ם':'מ','ן':'נ','ף':'פ','ץ':'צ' };
 
-// Keyboard rows — NO final letters, only base forms
 const KB_ROWS = [
   ['פ','ו','ט','א','ר','ק'],
   ['ל','ח','י','ע','כ','ג','ד','ש'],
   ['ENTER','ה','ז','ס','ב','מ','צ','ת','נ','⌫']
 ];
 
-// ─── State ─────────────────────────────────────────────────────
-let currentRow = 0;
-let currentCol = 0;
-let board = Array.from({length: MAX_TRIES}, () => Array(WORD_LEN).fill(''));
-let gameOver = false;
-let keyStates = {};
+let currentRow = 0, currentCol = 0;
+let board = Array.from({length:MAX_TRIES}, () => Array(WORD_LEN).fill(''));
+let gameOver = false, keyStates = {};
 
-// ─── Helpers ───────────────────────────────────────────────────
-function baseForm(ch) { return FROM_FINAL[ch] || ch; }
+function baseForm(ch)  { return FROM_FINAL[ch] || ch; }
+function getTile(r,c)  { return document.getElementById(`tile-${r}-${c}`); }
 
 function applyFinalForm() {
   if (currentCol === 0) return;
-  const idx = currentCol - 1;
-  const ch = board[currentRow][idx];
-  if (TO_FINAL[ch]) {
-    const final = TO_FINAL[ch];
-    board[currentRow][idx] = final;
-    const tile = getTile(currentRow, idx);
-    tile.textContent = final;
-  }
+  const idx = currentCol - 1, ch = board[currentRow][idx];
+  if (TO_FINAL[ch]) { board[currentRow][idx] = TO_FINAL[ch]; getTile(currentRow,idx).textContent = TO_FINAL[ch]; }
 }
 
-function revertFinalFormAt(rowIdx, colIdx) {
-  const ch = board[rowIdx][colIdx];
-  if (FROM_FINAL[ch]) {
-    const base = FROM_FINAL[ch];
-    board[rowIdx][colIdx] = base;
-    const tile = getTile(rowIdx, colIdx);
-    tile.textContent = base;
-  }
+function revertFinalFormAt(r, c) {
+  const ch = board[r][c];
+  if (FROM_FINAL[ch]) { board[r][c] = FROM_FINAL[ch]; getTile(r,c).textContent = FROM_FINAL[ch]; }
 }
 
-function getTile(r, c) { return document.getElementById(`tile-${r}-${c}`); }
-
-// ─── Build Board ───────────────────────────────────────────────
 function buildBoard() {
-  const boardEl = document.getElementById('board');
-  boardEl.innerHTML = '';
+  const el = document.getElementById('board'); el.innerHTML = '';
   for (let r = 0; r < MAX_TRIES; r++) {
-    const row = document.createElement('div');
-    row.className = 'row';
-    row.id = `row-${r}`;
+    const row = document.createElement('div'); row.className='row'; row.id=`row-${r}`;
     for (let c = 0; c < WORD_LEN; c++) {
-      const tile = document.createElement('div');
-      tile.className = 'tile';
-      tile.id = `tile-${r}-${c}`;
-      row.appendChild(tile);
+      const t = document.createElement('div'); t.className='tile'; t.id=`tile-${r}-${c}`; row.appendChild(t);
     }
-    boardEl.appendChild(row);
+    el.appendChild(row);
   }
 }
 
-// ─── Build Keyboard ────────────────────────────────────────────
 function buildKeyboard() {
-  const kbEl = document.getElementById('keyboard');
-  kbEl.innerHTML = '';
+  const el = document.getElementById('keyboard'); el.innerHTML = '';
   KB_ROWS.forEach(keys => {
-    const row = document.createElement('div');
-    row.className = 'kb-row';
+    const row = document.createElement('div'); row.className='kb-row';
     keys.forEach(k => {
       const btn = document.createElement('button');
-      btn.className = 'key' + (k === 'ENTER' || k === '⌫' ? ' wide' : '');
-      btn.textContent = k === 'ENTER' ? 'אישור' : k;
-      btn.dataset.key = k;
-      btn.id = `key-${k}`;
+      btn.className = 'key' + (k==='ENTER'||k==='⌫' ? ' wide' : '');
+      btn.textContent = k==='ENTER' ? 'אישור' : k;
+      btn.dataset.key = k; btn.id = `key-${k}`;
       btn.addEventListener('click', () => handleKey(k));
       row.appendChild(btn);
     });
-    kbEl.appendChild(row);
+    el.appendChild(row);
   });
 }
 
-// ─── Input Handling ────────────────────────────────────────────
 document.addEventListener('keydown', e => {
   if (gameOver) return;
-  if (e.key === 'Enter') handleKey('ENTER');
-  else if (e.key === 'Backspace') handleKey('⌫');
+  if (e.key==='Enter') handleKey('ENTER');
+  else if (e.key==='Backspace') handleKey('⌫');
   else if (/^[\u05D0-\u05EA]$/.test(e.key)) handleKey(baseForm(e.key));
 });
 
 function handleKey(key) {
   if (gameOver) return;
-  if (key === '⌫') deleteLetter();
-  else if (key === 'ENTER') submitGuess();
+  if (key==='⌫') deleteLetter();
+  else if (key==='ENTER') submitGuess();
   else if (/^[\u05D0-\u05EA]$/.test(key)) addLetter(baseForm(key));
 }
 
 function addLetter(letter) {
   if (currentCol >= WORD_LEN) return;
-  // Revert previous last letter from final form before adding new letter
-  if (currentCol > 0) revertFinalFormAt(currentRow, currentCol - 1);
-
+  if (currentCol > 0) revertFinalFormAt(currentRow, currentCol-1);
   board[currentRow][currentCol] = letter;
   const tile = getTile(currentRow, currentCol);
-  tile.textContent = letter;
-  tile.dataset.letter = letter;
+  tile.textContent = letter; tile.dataset.letter = letter;
   currentCol++;
-
-  // Apply final form to new last letter
   applyFinalForm();
-
-  // Pop animation
-  tile.classList.remove('pop');
-  void tile.offsetWidth;
-  tile.classList.add('pop');
+  tile.classList.remove('pop'); void tile.offsetWidth; tile.classList.add('pop');
 }
 
 function deleteLetter() {
   if (currentCol <= 0) return;
-  // Revert final form on last letter (we're removing it)
-  revertFinalFormAt(currentRow, currentCol - 1);
+  revertFinalFormAt(currentRow, currentCol-1);
   currentCol--;
   board[currentRow][currentCol] = '';
   const tile = getTile(currentRow, currentCol);
-  tile.textContent = '';
-  delete tile.dataset.letter;
-  // Apply final form to new last letter
+  tile.textContent = ''; delete tile.dataset.letter;
   applyFinalForm();
 }
 
 function submitGuess() {
-  if (currentCol < WORD_LEN) {
-    shakeRow(currentRow);
-    showToast('המילה קצרה מדי');
-    return;
-  }
-
+  if (currentCol < WORD_LEN) { shakeRow(currentRow); showToast('המילה קצרה מדי'); return; }
   const guess = board[currentRow].join('');
   revealRow(currentRow, guess, () => {
     if (guess === ANSWER) {
-      bounceRow(currentRow);
-      gameOver = true;
-      setTimeout(() => showModal(true, currentRow + 1), 700);
+      bounceRow(currentRow); gameOver = true;
+      setTimeout(() => showModal(true, currentRow+1), 700);
     } else {
-      currentRow++;
-      currentCol = 0;
-      if (currentRow >= MAX_TRIES) {
-        gameOver = true;
-        setTimeout(() => showModal(false, MAX_TRIES), 400);
-      }
+      currentRow++; currentCol = 0;
+      if (currentRow >= MAX_TRIES) { gameOver = true; setTimeout(() => showModal(false), 400); }
     }
   });
 }
 
-// ─── Reveal Row ────────────────────────────────────────────────
 function revealRow(rowIdx, guess, callback) {
-  const answerArr = ANSWER.split('');
-  const guessArr  = guess.split('');
-  const result = Array(WORD_LEN).fill('absent');
-  const count = {};
-
-  for (let i = 0; i < WORD_LEN; i++) {
-    if (guessArr[i] === answerArr[i]) {
-      result[i] = 'correct';
-    } else {
-      count[answerArr[i]] = (count[answerArr[i]] || 0) + 1;
-    }
+  const ansArr = ANSWER.split(''), guessArr = guess.split('');
+  const result = Array(WORD_LEN).fill('absent'), count = {};
+  for (let i=0;i<WORD_LEN;i++) {
+    if (guessArr[i]===ansArr[i]) result[i]='correct';
+    else count[ansArr[i]] = (count[ansArr[i]]||0)+1;
   }
-  for (let i = 0; i < WORD_LEN; i++) {
-    if (result[i] !== 'correct') {
-      const ch = guessArr[i];
-      if (count[ch] > 0) { result[i] = 'present'; count[ch]--; }
-    }
+  for (let i=0;i<WORD_LEN;i++) {
+    if (result[i]!=='correct') { const ch=guessArr[i]; if(count[ch]>0){result[i]='present';count[ch]--;} }
   }
-
-  for (let i = 0; i < WORD_LEN; i++) {
-    ((idx, state) => {
+  for (let i=0;i<WORD_LEN;i++) {
+    ((idx,state) => {
       setTimeout(() => {
-        const tile = getTile(rowIdx, idx);
+        const tile = getTile(rowIdx,idx);
         tile.classList.add('reveal');
         setTimeout(() => {
-          tile.classList.remove('reveal');
-          tile.classList.add(state);
-          // Update keyboard — use base form for key lookup
+          tile.classList.remove('reveal'); tile.classList.add(state);
           const ch = baseForm(guessArr[idx]);
-          const priority = { correct:3, present:2, absent:1 };
-          if ((priority[state] || 0) > (priority[keyStates[ch]] || 0)) {
-            keyStates[ch] = state;
-            const keyEl = document.getElementById(`key-${ch}`);
-            if (keyEl) { keyEl.classList.remove('correct','present','absent'); keyEl.classList.add(state); }
+          const pri = {correct:3,present:2,absent:1};
+          if ((pri[state]||0) > (pri[keyStates[ch]]||0)) {
+            keyStates[ch]=state;
+            const k = document.getElementById(`key-${ch}`);
+            if(k){k.classList.remove('correct','present','absent');k.classList.add(state);}
           }
-          if (idx === WORD_LEN - 1) setTimeout(callback, 200);
-        }, 250);
-      }, idx * 300);
-    })(i, result[i]);
+          if (idx===WORD_LEN-1) setTimeout(callback,200);
+        },250);
+      }, idx*300);
+    })(i,result[i]);
   }
 }
 
-// ─── Animations ────────────────────────────────────────────────
-function shakeRow(rowIdx) {
-  document.getElementById(`row-${rowIdx}`).querySelectorAll('.tile').forEach(t => {
-    t.classList.add('shake');
-    t.addEventListener('animationend', () => t.classList.remove('shake'), {once:true});
+function shakeRow(r) {
+  document.getElementById(`row-${r}`).querySelectorAll('.tile').forEach(t => {
+    t.classList.add('shake'); t.addEventListener('animationend',()=>t.classList.remove('shake'),{once:true});
   });
 }
-
-function bounceRow(rowIdx) {
-  document.getElementById(`row-${rowIdx}`).querySelectorAll('.tile').forEach((t, i) => {
-    setTimeout(() => {
-      t.classList.add('bounce');
-      t.addEventListener('animationend', () => t.classList.remove('bounce'), {once:true});
-    }, i * 120);
+function bounceRow(r) {
+  document.getElementById(`row-${r}`).querySelectorAll('.tile').forEach((t,i) => {
+    setTimeout(()=>{ t.classList.add('bounce'); t.addEventListener('animationend',()=>t.classList.remove('bounce'),{once:true}); },i*120);
   });
 }
-
-// ─── Toast ─────────────────────────────────────────────────────
 function showToast(msg) {
-  const t = document.createElement('div');
-  t.className = 'toast';
-  t.textContent = msg;
+  const t = document.createElement('div'); t.className='toast'; t.textContent=msg;
   document.getElementById('toast-container').appendChild(t);
-  setTimeout(() => t.remove(), 1900);
+  setTimeout(()=>t.remove(),1900);
 }
 
-// ─── Modal ─────────────────────────────────────────────────────
 const WON_MSGS = [
-  { emoji: '🌟', title: 'מדהים!',      desc: 'ניחשתם בניסיון הראשון — גאונים!' },
-  { emoji: '💕', title: 'מצוין!',      desc: 'שני ניסיונות בלבד. כבר אוהבים את השם!' },
-  { emoji: '🎀', title: 'כל הכבוד!',  desc: 'ניחשתם! ברוכה הבאה לעולם, ארבל!' },
-  { emoji: '😅', title: 'פיוו!',       desc: 'בניסיון האחרון, אבל הצלחתם!' },
+  {emoji:'🌟',title:'מדהים!',      desc:'ניחשתם בניסיון הראשון — גאונים!'},
+  {emoji:'💕',title:'מצוין!',      desc:'שני ניסיונות בלבד. כבר אוהבים את השם!'},
+  {emoji:'🎀',title:'כל הכבוד!',  desc:'ניחשתם! ברוכה הבאה לעולם, ארבל!'},
+  {emoji:'😅',title:'פיוו!',       desc:'בניסיון האחרון, אבל הצלחתם!'},
 ];
-const LOST_MSG = { emoji: '💙', title: 'לא הפעם...', desc: 'לא ניחשתם הפעם, אבל השם יפה בכל מקרה 💕' };
+const LOST_MSG = {emoji:'💙',title:'לא הפעם...',desc:'לא ניחשתם הפעם, אבל השם יפה בכל מקרה 💕'};
 
 function showModal(won, tries) {
-  const msg = won ? WON_MSGS[tries - 1] : LOST_MSG;
-  document.getElementById('modal-emoji').textContent = msg.emoji;
-  document.getElementById('modal-title').textContent = msg.title;
-  document.getElementById('modal-desc').textContent = msg.desc;
-  document.getElementById('modal-word').textContent = '✨ ' + ANSWER + ' ✨';
-  document.getElementById('modal-tries').textContent = won
-    ? `ניחשתם ב-${tries} מתוך ${MAX_TRIES} ניסיונות`
-    : `התשובה הייתה: ${ANSWER}`;
+  const msg = won ? WON_MSGS[tries-1] : LOST_MSG;
+  document.getElementById('modal-emoji').textContent  = msg.emoji;
+  document.getElementById('modal-title').textContent  = msg.title;
+  document.getElementById('modal-desc').textContent   = msg.desc;
+  document.getElementById('modal-word').textContent   = '✨ '+ANSWER+' ✨';
+  document.getElementById('modal-tries').textContent  = won ? `ניחשתם ב-${tries} מתוך ${MAX_TRIES} ניסיונות` : `התשובה הייתה: ${ANSWER}`;
   document.getElementById('modal-overlay').classList.add('show');
 }
 
 document.getElementById('play-again').addEventListener('click', () => {
   document.getElementById('modal-overlay').classList.remove('show');
-  currentRow = 0; currentCol = 0;
-  board = Array.from({length: MAX_TRIES}, () => Array(WORD_LEN).fill(''));
-  gameOver = false; keyStates = {};
+  currentRow=0; currentCol=0;
+  board=Array.from({length:MAX_TRIES},()=>Array(WORD_LEN).fill(''));
+  gameOver=false; keyStates={};
   buildBoard();
-  document.querySelectorAll('.key').forEach(k => k.classList.remove('correct','present','absent'));
+  document.querySelectorAll('.key').forEach(k=>k.classList.remove('correct','present','absent'));
 });
 
-// ─── Init ──────────────────────────────────────────────────────
 buildBoard();
 buildKeyboard();
 </script>
